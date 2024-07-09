@@ -16,8 +16,8 @@ class Game:
         self.all_sprites = AllSprites()
         
         self.import_assets()
-        # self.setup(self.tmx_maps['world'], 'house')
-        self.setup(self.tmx_maps['hospital'], 'world')
+        self.setup(self.tmx_maps['world'], 'house')
+        # self.setup(self.tmx_maps['hospital'], 'world')
         
     def import_assets(self):
         self.tmx_maps = {
