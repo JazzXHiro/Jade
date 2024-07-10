@@ -1,9 +1,10 @@
 from settings import *
 from pytmx.util_pygame import load_pygame
 from os.path import join
-from sprites import Sprite
+from sprites import *
 from entities import Player
 from groups import AllSprites
+from support import *
 
 class Game:
     def __init__(self):
@@ -24,7 +25,10 @@ class Game:
             'world' : load_pygame(join('data', 'maps', 'world.tmx')),
             'hospital' : load_pygame(join('data', 'maps', 'hospital.tmx'))
             }
-        print("Assets imported")
+        
+        self.overworld_frames = {
+            'water' : import_folder(join('graphics', 'tilesets', 'water'))
+        }
 
     def setup(self, tmx_map, player_start_pos):
         #terrain
@@ -40,8 +44,14 @@ class Game:
         for obj in tmx_map.get_layer_by_name('Entities'):
             if obj.name == 'Player' and obj.properties['pos'] == player_start_pos:
                 self.player = Player((obj.x, obj.y), self.all_sprites)
-                print(f"Player created at position: ({obj.x}, {obj.y})")           
-
+                # print(f"Player created at position: ({obj.x}, {obj.y})")
+                
+        #water
+        for obj in tmx_map.get_layer_by_name('Water'):
+            for x in range(int(obj.x), int(obj.x + obj.width), TILE_SIZE):
+                for y in range(int(obj.y), int(obj.y + obj.height), TILE_SIZE):
+                    AnimatedSprite((x,y), self.overworld_frames['water'], self.all_sprites)
+                
     def run(self):
         while True:
             dt = self.clock.tick() / 1000 #gives us the time difference b/w the last frame and the current frame
@@ -55,8 +65,8 @@ class Game:
             self.all_sprites.update(dt)
             self.display_surface.fill('black')
             self.all_sprites.draw(self.player.rect.center)
-            print(self.clock.get_fps())
-            print(dt)
+            # print(self.clock.get_fps())
+            # print(dt)
             pygame.display.update()
             
 if __name__ == '__main__':

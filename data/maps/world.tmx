@@ -4373,7 +4373,7 @@
    </properties>
   </object>
  </objectgroup>
- <objectgroup id="10" name="Water" visible="0">
+ <objectgroup id="10" name="Water">
   <object id="136" x="0" y="5056" width="5504" height="320"/>
   <object id="161" x="3648" y="2496" width="192" height="192"/>
   <object id="162" x="3840" y="2560" width="512" height="128"/>
