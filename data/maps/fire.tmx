@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.10.1" orientation="orthogonal" renderorder="right-down" width="24" height="34" tilewidth="64" tileheight="64" infinite="0" nextlayerid="14" nextobjectid="933">
+<map version="1.10" tiledversion="1.10.1" orientation="orthogonal" renderorder="right-down" width="24" height="34" tilewidth="64" tileheight="64" infinite="0" nextlayerid="14" nextobjectid="911">
  <tileset firstgid="1" source="../tilesets/world.tsx"/>
  <tileset firstgid="211" source="../tilesets/objects.tsx"/>
  <tileset firstgid="242" source="../tilesets/Grass.tsx"/>
@@ -175,30 +175,7 @@
   <object id="894" gid="213" x="1152" y="1024" width="128" height="192"/>
   <object id="907" gid="241" x="1175" y="1547" width="56" height="60"/>
  </objectgroup>
- <objectgroup id="12" name="Collisions">
-  <object id="911" x="195.162" y="315.532" width="1187.33" height="113.358"/>
-  <object id="912" x="772.468" y="1870.99" width="841.418" height="162.44"/>
-  <object id="913" x="1244.6" y="1826.58" width="361.108" height="181.139"/>
-  <object id="914" x="128.55" y="1849.95" width="511.863" height="140.236"/>
-  <object id="915" x="93.4909" y="1766.98" width="257.1" height="64.275"/>
-  <object id="916" x="108.683" y="1604.54" width="177.633" height="156.597"/>
-  <object id="917" x="107.515" y="1035.41" width="122.707" height="559.777"/>
-  <object id="918" x="86.4791" y="524.718" width="73.6241" height="529.392"/>
-  <object id="919" x="170.621" y="438.238" width="53.7573" height="111.02"/>
-  <object id="920" x="239.57" y="446.419" width="53.7573" height="42.0709"/>
-  <object id="921" x="542" y="1569.33" width="138.667" height="124"/>
-  <object id="922" x="614.667" y="1501.33" width="184.667" height="136.667"/>
-  <object id="923" x="511.333" y="748" width="390.667" height="81.3333"/>
-  <object id="924" x="912.667" y="807.333" width="51.3333" height="407.333"/>
-  <object id="925" x="834" y="1138.67" width="66.6667" height="140"/>
-  <object id="926" x="769.333" y="1202" width="60.6667" height="74"/>
-  <object id="927" x="512.667" y="1194" width="126" height="82.6667"/>
-  <object id="928" x="450" y="812.667" width="61.3333" height="464"/>
-  <object id="929" x="584" y="835.333" width="56.6667" height="181.333"/>
-  <object id="930" x="772.667" y="833.333" width="60" height="192"/>
-  <object id="931" x="1306.67" y="1020" width="112" height="802.667"/>
-  <object id="932" x="1236" y="441.333" width="66.6667" height="646.667"/>
- </objectgroup>
+ <objectgroup id="12" name="Collisions"/>
  <objectgroup id="5" name="Transition">
   <object id="851" x="644.833" y="1976.33" width="114.917" height="3.83333">
    <properties>
