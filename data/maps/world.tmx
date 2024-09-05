@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="86" height="86" tilewidth="64" tileheight="64" infinite="0" nextlayerid="14" nextobjectid="1152">
+<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="86" height="86" tilewidth="64" tileheight="64" infinite="0" nextlayerid="14" nextobjectid="1154">
  <tileset firstgid="1" source="../tilesets/world.tsx"/>
  <tileset firstgid="211" source="../tilesets/objects.tsx"/>
  <tileset firstgid="242" source="../tilesets/Grass.tsx"/>
@@ -4166,8 +4166,8 @@
   <object id="714" x="2632" y="243" width="188" height="49"/>
   <object id="715" x="2786" y="296" width="41" height="52"/>
   <object id="716" x="2383" y="225" width="241" height="59"/>
-  <object id="717" x="269" y="1058" width="369" height="281"/>
-  <object id="718" x="370" y="892" width="206" height="159"/>
+  <object id="717" x="577" y="1058" width="61" height="281"/>
+  <object id="718" x="429" y="892" width="147" height="159"/>
   <object id="719" x="772" y="1092" width="312" height="118"/>
   <object id="720" x="775" y="1033" width="280" height="60"/>
   <object id="721" x="1097" y="1043" width="52" height="98"/>
@@ -4334,8 +4334,9 @@
   <object id="1132" x="4097.25" y="3299.25" width="365.5" height="58.5"/>
   <object id="1133" x="1935.25" y="2341.25" width="416" height="58.5"/>
   <object id="1134" x="1616" y="2085.75" width="352" height="58.5"/>
+  <object id="1153" x="291.531" y="1339.64" width="61" height="281" rotation="269.942"/>
  </objectgroup>
- <objectgroup id="5" name="Transition" visible="0">
+ <objectgroup id="5" name="Transition">
   <object id="17" x="4421.09" y="3770.75" width="54.6667" height="3.83333">
    <properties>
     <property name="pos" value="world"/>
