@@ -11,6 +11,7 @@ class MonsterIndex:
         # frames
         self.icon_frames = monster_frames['icons']
         self.monster_frames = monster_frames['monsters']
+        self.ui_frames = monster_frames['ui']
         
         #tint surf
         self.tint_surf = pygame.Surface((WINDOW_WIDTH, WINDOW_HEIGHT))
@@ -127,12 +128,52 @@ class MonsterIndex:
             'width': rect.width * 0.45,
             'height': 30,
             'top': top_rect.bottom + rect.width * 0.03,
-            'left_side': rect.left + rect.width / 4
+            'left_side': rect.left + rect.width / 4,
+            'right_side': rect.left + rect.width * 3/4
         }
         
         healthbar_rect = pygame.FRect((0,0), (bar_data['width'],bar_data['height'])).move_to(midtop = (bar_data['left_side'], bar_data['top'])) 
         draw_bar(self.display_surface, healthbar_rect, monster.health, monster.get_stat('max_health'), COLORS['red'], COLORS['black'], 2)
+        hp_text = self.font['regular'].render(f'HP: {int(monster.health)}/{int(monster.get_stat('max_health'))}', False, COLORS['white'])
+        hp_rect = hp_text.get_frect(midleft = healthbar_rect.midleft + vector(10,0))
+        self.display_surface.blit(hp_text, hp_rect)
+        
+        energybar_rect = pygame.FRect((0,0), (bar_data['width'],bar_data['height'])).move_to(midtop = (bar_data['right_side'], bar_data['top'])) 
+        draw_bar(self.display_surface, energybar_rect, monster.energy, monster.get_stat('max_energy'), COLORS['blue'], COLORS['black'], 2)
+        ep_text = self.font['regular'].render(f'HP: {int(monster.health)}/{int(monster.get_stat('max_health'))}', False, COLORS['white'])
+        ep_rect = ep_text.get_frect(midleft = energybar_rect.midleft + vector(10,0))
+        self.display_surface.blit(ep_text, ep_rect)
+        
+        #info
+        sides = {'left': healthbar_rect.left, 'right': energybar_rect.left}
+        info_height = rect.bottom - healthbar_rect.bottom
+        
+        #stats
+        stats_rect = pygame.FRect(sides['left'], healthbar_rect.bottom, healthbar_rect.width, info_height).inflate(0, -60)
+        stats_text_surf = self.font['regular'].render('Stats' , False, COLORS['white'])
+        stats_text_rect = stats_text_surf.get_frect(bottomleft = stats_rect.topleft)
+        self.display_surface.blit(stats_text_surf, stats_text_rect)
+        
+        monster_stats = monster.get_stats()
+        stat_height = stats_rect.height / len(monster_stats)
+        
+        for index, (stat, value) in enumerate(monster_stats.items()):
+            single_stat_rect = pygame.FRect(stats_rect.left, stats_rect.top + index * stat_height, stats_rect.width, stat_height)
             
+            #icon
+            icon_surf = self.ui_frames[stat]
+            icon_rect = icon_surf.get_frect(midleft = single_stat_rect.midleft + vector(5,0))
+            self.display_surface.blit(icon_surf, icon_rect)
+            
+            
+            #text
+            text_surf = self.font['regular'].render(stat, False, COLORS['white'])
+            text_rect = text_surf.get_frect(topleft = icon_rect.topleft + vector(30,-10))
+            self.display_surface.blit(text_surf, text_rect)
+            
+            #bar
+            
+
     def update(self, dt):
         self.input()#input
         self.display_surface.blit(self.tint_surf, (0,0))#tint the game
