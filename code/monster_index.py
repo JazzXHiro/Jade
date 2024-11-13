@@ -1,5 +1,6 @@
 from settings import *
 from support import draw_bar
+from game_data import MONSTER_DATA, ATTACK_DATA
 
 class MonsterIndex:
     def __init__(self, monsters, fonts, monster_frames):
@@ -27,6 +28,20 @@ class MonsterIndex:
         self.index = 0
         self.selected_index = None
         
+        # max values
+        self.max_stats = {}
+        for data in MONSTER_DATA.values():
+            for stat, value in data['stats'].items():
+                if stat != 'element':
+                    if stat not in self.max_stats:
+                        self.max_stats[stat] = value
+                    else:
+                        self.max_stats[stat] = value if value > self.max_stats[stat] else self.max_stats[stat]
+        self.max_stats['health'] = self.max_stats.pop('max_health') #to get rid of a key of a dictionary value
+        self.max_stats['energy'] = self.max_stats.pop('max_energy')
+        print(self.max_stats)
+        
+        
     def input(self):
         keys = pygame.key.get_just_pressed()
         if keys[pygame.K_UP]:
@@ -46,6 +61,9 @@ class MonsterIndex:
         self.index = self.index % len(self.monsters)
         
     def display_list(self):
+        bg_rect = pygame.FRect(self.main_rect.topleft,(self.list_width, self.main_rect.height))
+        pygame.draw.rect(self.display_surface, 'grey', bg_rect,0,0,12,0,12,0)
+        
         v_offset = 0 if self.index < self.visible_items else -(self.index - self.visible_items + 1) * self.item_height
         for index, monster in self.monsters.items():
             #colors
@@ -73,7 +91,7 @@ class MonsterIndex:
                 self.display_surface.blit(icon_surf, icon_rect)
             
             #lines
-            for i in range(min(self.visible_items, len(self.monsters))):
+            for i in range(1, min(self.visible_items, len(self.monsters))):
                 y = self.main_rect.top + self.item_height * i
                 left = self.main_rect.left
                 right = self.main_rect.left + self.list_width
@@ -149,7 +167,7 @@ class MonsterIndex:
         info_height = rect.bottom - healthbar_rect.bottom
         
         #stats
-        stats_rect = pygame.FRect(sides['left'], healthbar_rect.bottom, healthbar_rect.width, info_height).inflate(0, -60)
+        stats_rect = pygame.FRect(sides['left'], healthbar_rect.bottom, healthbar_rect.width, info_height).inflate(0, -60).move(0,15)
         stats_text_surf = self.font['regular'].render('Stats' , False, COLORS['white'])
         stats_text_rect = stats_text_surf.get_frect(bottomleft = stats_rect.topleft)
         self.display_surface.blit(stats_text_surf, stats_text_rect)
@@ -172,7 +190,23 @@ class MonsterIndex:
             self.display_surface.blit(text_surf, text_rect)
             
             #bar
+            bar_rect = pygame.FRect((text_rect.left, text_rect.bottom + 2), (single_stat_rect.width - (text_rect.left - single_stat_rect.left),4))
+            draw_bar(self.display_surface, bar_rect, value, self.max_stats[stat] * monster.level, COLORS['white'], COLORS['black'])
             
+        #abilities
+        ability_rect = stats_rect.copy().move_to(left = sides['right'])
+        ability_text_surf = self.font['regular'].render('Ability' , False, COLORS['white'])
+        ability_text_rect = ability_text_surf.get_frect(bottomleft = ability_rect.topleft)
+        self.display_surface.blit(ability_text_surf, ability_text_rect)
+        
+        for index, ability in enumerate(monster.get_abilities()):
+            element = ATTACK_DATA[ability]['element']
+            text_surf =  self.font['regular'].render(ability, False, COLORS['black'])
+            x = ability_rect.left + index % 2 * ability_rect.width / 2
+            y = 20 + ability_rect.top + int(index / 2) * (text_surf.get_height() + 20)
+            rect = text_surf.get_frect(topleft = (x,y))
+            pygame.draw.rect(self.display_surface, COLORS[element], rect.inflate(10,10), 0, 4)
+            self.display_surface.blit(text_surf, rect)
 
     def update(self, dt):
         self.input()#input

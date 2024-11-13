@@ -8,6 +8,7 @@ from entities import Character, Player
 from groups import AllSprites
 from dialog import DialogTree
 from monster_index import MonsterIndex
+from battle import Battle
 
 from support import *
 from monster import Monster
@@ -30,6 +31,14 @@ class Game:
 			5: Monster('Gulfin', 24),
 			6: Monster('Jacana', 2),
 			7: Monster('Pouch', 3)
+		}
+  
+		self.dummy_monsters = {
+			0: Monster('Atrox', 12),
+			1: Monster('Sparchu', 15),
+			2: Monster('Gulfin', 19),
+			3: Monster('Jacana', 2),
+			4: Monster('Pouch', 3)
 		}
 
 		# groups 
@@ -54,6 +63,7 @@ class Game:
 		self.dialog_tree = None
 		self.monster_index = MonsterIndex(self.player_monsters, self.fonts, self.monster_frames)
 		self.index_open = False
+		self.battle = Battle(self.player_monsters, self.dummy_monsters, self.monster_frames, self.bg_frames['forest'], self.fonts)
 
 	def import_assets(self):
 		self.tmx_maps = tmx_importer('data', 'maps')
@@ -77,6 +87,8 @@ class Game:
 			'ui': import_folder_dict('graphics', 'ui')
 		}
 		# print(self.monster_frames['monsters'])
+  
+		self.bg_frames = import_folder_dict('graphics', 'backgrounds')
 	
 	def setup(self, tmx_map, player_start_pos):
 			#clear the map
@@ -204,8 +216,9 @@ class Game:
 			self.all_sprites.draw(self.player)
    
 			#overlays
-			if self.dialog_tree: self.dialog_tree.update()
-			if self.index_open: self.monster_index.update(dt)
+			if self.dialog_tree: 	self.dialog_tree.update()
+			if self.index_open: 	self.monster_index.update(dt)
+			if self.battle: 		self.battle.update(dt)
    
 			self.tint_screen(dt)
 			pygame.display.update()
