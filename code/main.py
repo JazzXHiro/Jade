@@ -149,7 +149,7 @@ class Game:
 
 #dialog system
 	def input(self):
-		if not self.dialog_tree:
+		if not self.dialog_tree and not self.battle:
 			keys = pygame.key.get_just_pressed()
 			if keys[pygame.K_SPACE]:
 				for character in self.character_sprites:
