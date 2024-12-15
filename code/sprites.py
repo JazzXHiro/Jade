@@ -1,5 +1,7 @@
-from settings import * 
+from settings import *
+from random import uniform
 
+#overworld sprites
 class Sprite(pygame.sprite.Sprite):
 	def __init__(self, pos, surf, groups, z = WORLD_LAYERS['main']):
 		super().__init__(groups)
@@ -44,3 +46,51 @@ class AnimatedSprite(Sprite):
 
 	def update(self, dt):
 		self.animate(dt)
+  
+#battle sprites
+class MonsterSprite(pygame.sprite.Sprite):
+    def __init__(self, pos, frames, groups, monster, index, pos_index, entity):
+        #data
+        self.index = index
+        self.pos_index = pos_index
+        self.entity = entity
+        self.monster = monster
+        self.frame_index, self.frames, self.state = 0, frames, 'idle'
+        self.animation_speed = ANIMATION_SPEED + uniform(-1, 1) #float equivalent of randint
+        
+        #sprite setup
+        super().__init__(groups)
+        self.image = self.frames[self.state][self.frame_index]
+        self.rect = self.image.get_frect(center = pos)
+    
+    def animate(self, dt):
+        self.frame_index += ANIMATION_SPEED * dt
+        self.image = self.frames[self.state][int(self.frame_index)%len(self.frames[self.state])]
+        
+    def update(self, dt):
+        self.animate(dt)
+        
+class MonsterNameSprite(pygame.sprite.Sprite):
+    def __init__(self, pos, monster_sprite, groups, font):
+        super().__init__(groups)
+        self.monster_sprite = monster_sprite
+        
+        text_surf = font.render(monster_sprite.monster.name, False, COLORS['black'])
+        padding = 10
+        
+        self.image = pygame.Surface((text_surf.get_width() + 2 * padding, text_surf.get_height() + 2 * padding))
+        self.image.fill(COLORS['white'])
+        self.image.blit(text_surf, (padding, padding))
+        self.rect = self.image.get_frect(midtop = pos)
+        
+class MonsterLevelSprite(pygame.sprite.Sprite):
+    def __init__(self, entity, anchor, monster_sprite, groups, font):
+        super().__init__(groups)
+        self.monster_sprite = monster_sprite
+        self.font = font
+        
+        self.image = pygame.Surface((60,26))
+        self.rect = self.image.get_frect(topleft = anchor) if entity == 'player' else self.image.get_frect(topright = anchor)
+        
+    def update(self, _):
+        self.image.fill(COLORS['white'])
