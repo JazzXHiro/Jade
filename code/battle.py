@@ -1,5 +1,6 @@
 from settings import *
-from sprites import MonsterSprite, MonsterNameSprite, MonsterLevelSprite
+from sprites import MonsterSprite, MonsterNameSprite, MonsterLevelSprite, MonsterStatSprite
+from groups import BattleSprites
 
 class Battle:
     def __init__(self, player_monsters, opponenet_monsters, monster_frames, bg_surf, fonts):
@@ -11,7 +12,7 @@ class Battle:
         self.monster_data = {'player': player_monsters, 'opponent': opponenet_monsters} #this is sometimes necessary as sometimes you would wanna update all the monsters.
         
         #groups
-        self.battle_sprites   = pygame.sprite.Group()
+        self.battle_sprites   = BattleSprites()
         self.player_sprites   = pygame.sprite.Group()
         self.opponent_sprites = pygame.sprite.Group()
         
@@ -41,10 +42,9 @@ class Battle:
         name_sprite = MonsterNameSprite(name_pos, monster_sprite, self.battle_sprites, self.fonts['regular'])
         anchor = name_sprite.rect.bottomleft if entity == 'player' else name_sprite.rect.bottomright
         MonsterLevelSprite(entity, anchor, monster_sprite, self.battle_sprites, self.fonts['small'])
-        # MonsterStatsSprite
-        
+        MonsterStatSprite(monster_sprite.rect.midbottom + vector (0, 20), monster_sprite, (150, 48), self.battle_sprites, self.fonts['small'])
         
     def update(self, dt):
         self.display_surface.blit(self.bg_surf, (0,0))
         self.battle_sprites.update(dt)
-        self.battle_sprites.draw(self.display_surface)
+        self.battle_sprites.draw()
