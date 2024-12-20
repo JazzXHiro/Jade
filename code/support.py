@@ -97,6 +97,29 @@ def monster_importer(cols, rows, *path):
                 monster_dict[image_name][key] = [frame_dict[(col,row)] for col in range(cols)]
     return monster_dict
 
+def outline_creator(frame_dict, width):
+    outline_frame_dict = {}
+    for monster, monster_frames in frame_dict.items():
+        outline_frame_dict[monster] = {}
+        for state, frames in monster_frames.items():
+            outline_frame_dict[monster][state] = [] #in this key we are storing all of the frames
+            for frame in frames:
+                new_surf = pygame.Surface(vector(frame.get_size()) + vector(width * 2), pygame.SRCALPHA)
+                new_surf.fill((0,0,0,0))
+                white_frame = pygame.mask.from_surface(frame).to_surface()
+                white_frame.set_colorkey('black')  #sets a specific color to be treated as transparent when the surface is rendered
+                
+                new_surf.blit(white_frame, (0,0)) #topleft
+                new_surf.blit(white_frame, (width,0))
+                new_surf.blit(white_frame, (width * 2,0))#topright
+                new_surf.blit(white_frame, (width * 2,width)) #center right
+                new_surf.blit(white_frame, (width * 2,width*2)) #bottomright
+                new_surf.blit(white_frame, (width,width*2)) #bottom
+                new_surf.blit(white_frame, (0,width*2))#right
+                new_surf.blit(white_frame, (0,width))#left
+                outline_frame_dict[monster][state].append(new_surf)
+    return outline_frame_dict
+
 def draw_bar(surface, rect, value, max_value, color, bg_color, radius = 1):
     ratio = rect.width / max_value
     bg_rect = rect.copy()

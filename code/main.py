@@ -86,7 +86,7 @@ class Game:
 			'monsters': monster_importer(4,2,'graphics', 'monsters'),
 			'ui': import_folder_dict('graphics', 'ui')
 		}
-		# print(self.monster_frames['monsters'])
+		self.monster_frames['outlines'] = outline_creator(self.monster_frames['monsters'], 4)
   
 		self.bg_frames = import_folder_dict('graphics', 'backgrounds')
 	

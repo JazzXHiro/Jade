@@ -1,6 +1,7 @@
 from settings import *
 from random import uniform
 from support import draw_bar
+from monster import Monster
 
 #overworld sprites
 class Sprite(pygame.sprite.Sprite):
@@ -59,6 +60,7 @@ class MonsterSprite(pygame.sprite.Sprite):
         self.frame_index, self.frames, self.state = 0, frames, 'idle'
         self.animation_speed = ANIMATION_SPEED + uniform(-1, 1) #float equivalent of randint
         self.z = BATTLE_LAYERS['monster']
+        self.highlight = False
         
         #sprite setup
         super().__init__(groups)
@@ -69,8 +71,25 @@ class MonsterSprite(pygame.sprite.Sprite):
         self.frame_index += ANIMATION_SPEED * dt
         self.image = self.frames[self.state][int(self.frame_index)%len(self.frames[self.state])]
         
+    def self_highlight(self, value):
+        self.self_highlight = value
+        
     def update(self, dt):
         self.animate(dt)
+        self.monster.update(dt)
+        
+class MonsterOutlineSprite(pygame.sprite.Sprite):
+    def __init__(self, monster_sprite, groups, frames):
+        super().__init__(groups)
+        self.z = BATTLE_LAYERS['outline']
+        self.monster_sprite = monster_sprite
+        self.frames = frames
+        # print(self.frames)
+        self.image = self.frames[self.monster_sprite.state][self.monster_sprite.frame_index]
+        self.rect = self.image.get_frect(center = self.monster_sprite.rect.center)
+    
+    def update(self, _):
+        self.image = self.frames[self.monster_sprite.state][int(self.monster_sprite.frame_index)%len(self.monster_sprite.frames[self.monster_sprite.state])]
         
 class MonsterNameSprite(pygame.sprite.Sprite):
     def __init__(self, pos, monster_sprite, groups, font):
