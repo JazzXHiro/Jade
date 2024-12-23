@@ -34,9 +34,9 @@ class Game:
 		}
   
 		self.dummy_monsters = {
-			0: Monster('Atrox', 12),
-			1: Monster('Sparchu', 15),
-			2: Monster('Gulfin', 19),
+			0: Monster('Atrox', 2),
+			1: Monster('Sparchu', 3),
+			2: Monster('Gulfin', 5),
 			3: Monster('Jacana', 2),
 			4: Monster('Pouch', 3)
 		}
@@ -151,6 +151,7 @@ class Game:
 	def input(self):
 		if not self.dialog_tree and not self.battle:
 			keys = pygame.key.get_just_pressed()
+   
 			if keys[pygame.K_SPACE]:
 				for character in self.character_sprites:
 					if check_connection(100, self.player, character): #radius,

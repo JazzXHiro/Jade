@@ -21,7 +21,9 @@ COLORS = {
 	'black': '#000000', 
 	'red': '#f03131',
 	'blue': '#66d7ee',
-	'normal': '#ffffff'
+	'normal': '#ffffff',
+	'dark_white': '#f0f0f0',
+	'skin_sand': '#FCE9D6'
 }
 
 WORLD_LAYERS = {
