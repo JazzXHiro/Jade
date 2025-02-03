@@ -88,7 +88,7 @@ class Battle:
                 if self.selection_mode == 'attacks':
                     # self.selection_mode = 'target'
                     self.selected_attack = self.current_monster.monster.get_abilities(all = False)[self.indexes['attacks']]
-                    # print(self.selected_attack)
+                    print(self.selected_attack)
                     self.selection_side = ATTACK_DATA[self.selected_attack]['target']
                 
                 if self.selection_mode == 'general':
