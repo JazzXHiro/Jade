@@ -6,7 +6,7 @@ from support import draw_bar
 
 class Battle:
     #main
-    def __init__(self, player_monsters, opponenet_monsters, monster_frames, bg_surf, fonts):
+    def __init__(self, player_monsters, opponenet_monsters, monster_frames, bg_surf, fonts, apply_attack):
         #general
         self.display_surface = pygame.display.get_surface()
         self.bg_surf = bg_surf
@@ -53,7 +53,7 @@ class Battle:
             pos = list(BATTLE_POSITIONS['right'].values())[pos_index]
             groups = (self.battle_sprites, self.opponent_sprites)
         
-        monster_sprite = MonsterSprite(pos, frames, groups, monster, index, pos_index, entity)
+        monster_sprite = MonsterSprite(pos, frames, groups, monster, index, pos_index, entity, self.apply_attack)
         MonsterOutlineSprite(monster_sprite, self.battle_sprites, outline_frames)
         
         #ui
@@ -71,7 +71,7 @@ class Battle:
                 case 'general': limiter = len(BATTLE_CHOICES['full'])
                 case 'attacks': limiter = len(self.current_monster.monster.get_abilities(all = False))
                 case 'switch': limiter = len(self.available_monsters)
-                case 'target': limiter = len(self.opponent_sprites) if selection_side == 'opponent' else len(self.player_sprites)
+                case 'target': limiter = len(self.opponent_sprites) if self.selection_side == 'opponent' else len(self.player_sprites)
             
             if keys[pygame.K_DOWN]:
                 self.indexes[self.selection_mode] = (self.indexes[self.selection_mode] + 1) % limiter
@@ -84,11 +84,15 @@ class Battle:
                     sprites = {sprite.pos_index: sprite for sprite in sprite_group}
                     monster_sprite = sprites[list(sprites.keys())[self.indexes['target']]]
                     print(monster_sprite.monster)
+                    
+                    if self.selected_attack:
+                        self.current_monster.activate_attack (monster_sprite, self.selected_attack)
+                        self.selected_attack, self.current_monster, self.selection_mode = None, None, None
                 
                 if self.selection_mode == 'attacks':
-                    # self.selection_mode = 'target'
+                    self.selection_mode = 'target'
                     self.selected_attack = self.current_monster.monster.get_abilities(all = False)[self.indexes['attacks']]
-                    print(self.selected_attack)
+                    # print(self.selected_attack)
                     self.selection_side = ATTACK_DATA[self.selected_attack]['target']
                 
                 if self.selection_mode == 'general':
@@ -125,6 +129,11 @@ class Battle:
     def update_all_monsters(self, option):
         for monster_sprite in self.player_sprites.sprites() + self.opponent_sprites.sprites():
             monster_sprite.monster.paused = True if option == 'pause' else False
+            
+    def apply_attack(self, target_sprite, attack, amount):
+        print(target_sprite)
+        print(attack)
+        print(amount)
     
     #ui
     def draw_ui(self):
@@ -222,52 +231,6 @@ class Battle:
                 energy_rect = pygame.FRect((health_rect.bottomleft + vector(0,2)), (80,4))
                 draw_bar(self.display_surface, health_rect, monster.health, monster.get_stat('max_health'), COLORS['red'], COLORS['black'])
                 draw_bar(self.display_surface, energy_rect, monster.energy, monster.get_stat('max_energy'), COLORS['blue'], COLORS['black'])
-            
-            # for index, sprite in enumerate(available_monsters):
-            #     selected = index == self.indexes['switch']
-            #     monster = sprite.monster
-                
-            #     #text
-            #     if selected:
-            #         text_color = COLORS[monster.element] if monster.element!= 'normal' else COLORS['black']
-            #     else:
-            #         text_color = COLORS['light']
-                
-            #     name_surf = self.fonts['regular'].render(monster.name, False, text_color)
-            #     health_text = f"{int(monster.health)}/{int(monster.get_stat('max_health'))}"
-            #     health_surf = self.fonts['small'].render(health_text, False, text_color)
-                
-            #     #rect
-            #     text_rect = name_surf.get_frect(center = bg_rect.midtop + vector(0, item_height / 2 + index * item_height + v_offset))
-            #     health_rect = health_surf.get_frect(midtop = text_rect.midbottom + vector(0,2))
-            #     text_bg_rect = pygame.FRect((0,0), (width, item_height)).move_to(center = text_rect.center)
-                
-            #     #draw
-            #     if bg_rect.collidepoint(text_rect.center):
-            #         if selected:
-            #             if text_bg_rect.collidepoint(bg_rect.topleft):
-            #                 pygame.draw.rect(self.display_surface, COLORS['skin_sand'], text_bg_rect,0,0,5,5)
-            #             elif text_bg_rect.collidepoint(bg_rect.midbottom + vector(0,-1)):
-            #                 pygame.draw.rect(self.display_surface, COLORS['skin_sand'], text_bg_rect,0,0,0,0,5,5)
-            #             else:
-            #                 pygame.draw.rect(self.display_surface, COLORS['skin_sand'], text_bg_rect)
-                    
-            #         #Draw health bar
-            #         bar_rect = pygame.FRect((0,0), (width * 0.8, 4))
-            #         bar_rect.midtop = health_rect.midbottom + vector(0,4)
-            #         if bg_rect.contains(bar_rect):
-            #             draw_bar(
-            #                 self.display_surface,
-            #                 bar_rect,
-            #                 monster.health,
-            #                 monster.get_stat('max_health'),
-            #                 COLORS['red'],
-            #                 COLORS['light'],
-            #                 2
-            #             )
-                        
-            #         self.display_surface.blit(name_surf, text_rect)
-            #         self.display_surface.blit(health_surf, health_rect)
         
     def update(self, dt):
         #updates
@@ -277,5 +240,5 @@ class Battle:
                 
         #drawing
         self.display_surface.blit(self.bg_surf, (0,0))
-        self.battle_sprites.draw(self.current_monster)
+        self.battle_sprites.draw(self.current_monster, self.selection_side, self.selection_mode, self.indexes['target'], self.player_sprites, self.opponent_sprites)
         self.draw_ui()
