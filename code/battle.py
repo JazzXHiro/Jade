@@ -39,7 +39,10 @@ class Battle:
             for index, monster in {k:v for k,v in monster.items() if k <= 2}.items(): #using dictionary comprehension 
                 self.create_monster(monster, index, index, entity) #first index is to keep track of the monster and 2nd index is for  monster positioning(battlewindow)
                 
-                
+            #remove opponent monster data
+            for i in range(len(self.opponent_sprites)):
+                del self.monster_data['opponent'][i]
+        print(self.monster_data['opponent'])
     #pos index is the position of the monster in the battle window
     def create_monster(self, monster, index, pos_index, entity): #purpose of index is to uniquely identify a same entries of a monster
         frames = self.monster_frames['monsters'][monster.name]
@@ -53,7 +56,7 @@ class Battle:
             pos = list(BATTLE_POSITIONS['right'].values())[pos_index]
             groups = (self.battle_sprites, self.opponent_sprites)
         
-        monster_sprite = MonsterSprite(pos, frames, groups, monster, index, pos_index, entity, self.apply_attack)
+        monster_sprite = MonsterSprite(pos, frames, groups, monster, index, pos_index, entity, self.apply_attack, self.create_monster)
         MonsterOutlineSprite(monster_sprite, self.battle_sprites, outline_frames)
         
         #ui
@@ -155,6 +158,7 @@ class Battle:
         
         #update the monster health
         target_sprite.monster.health -= amount * target_defense
+        self.check_death()
         
         #resume
         self.update_all_monsters('resume')
@@ -162,6 +166,21 @@ class Battle:
         # print(target_sprite)
         # print(attack)
         # print(amount)
+    
+    def check_death(self):
+        for monster_sprite in self.opponent_sprites.sprites() + self.player_sprites.sprites():
+            if monster_sprite.monster.health <= 0:
+                if self.player_sprites in monster_sprite.groups(): #player
+                    pass
+                else:
+                    new_monster_data = (list(self.monster_data['opponent'].values())[0], monster_sprite.index, monster_sprite.pos_index, 'opponent') if self.monster_data['opponent'] else None
+                    if self.monster_data['opponent']:
+                        del self.monster_data['opponent'][min(self.monster_data['opponent'])]
+                        
+                    #xp
+                        
+                monster_sprite.delayed_kill(new_monster_data)
+                    
     
     #ui
     def draw_ui(self):
