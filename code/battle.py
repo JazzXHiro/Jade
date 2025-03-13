@@ -1,12 +1,12 @@
 from settings import *
-from sprites import MonsterSprite, MonsterNameSprite, MonsterLevelSprite, MonsterStatSprite, MonsterOutlineSprite
+from sprites import MonsterSprite, MonsterNameSprite, MonsterLevelSprite, MonsterStatSprite, MonsterOutlineSprite, AttackSprite
 from groups import BattleSprites
 from game_data import ATTACK_DATA
 from support import draw_bar
 
 class Battle:
     #main
-    def __init__(self, player_monsters, opponenet_monsters, monster_frames, bg_surf, fonts, apply_attack):
+    def __init__(self, player_monsters, opponenet_monsters, monster_frames, bg_surf, fonts):
         #general
         self.display_surface = pygame.display.get_surface()
         self.bg_surf = bg_surf
@@ -131,9 +131,37 @@ class Battle:
             monster_sprite.monster.paused = True if option == 'pause' else False
             
     def apply_attack(self, target_sprite, attack, amount):
-        print(target_sprite)
-        print(attack)
-        print(amount)
+        AttackSprite(target_sprite.rect.center, self.monster_frames['attacks'][ATTACK_DATA[attack]['animation']], self.battle_sprites)
+        
+        #get correct attack damage amount (defense, element)
+        attack_element = ATTACK_DATA[attack]['element']
+        target_element = target_sprite.monster.element
+        
+        #double attack
+        if attack_element == 'fire' and target_element == 'plant' or \
+            attack_element == 'water' and target_element == 'fire' or \
+            attack_element == 'plant' and target_element == 'water':
+            amount *= 2
+            
+        #halved attack
+        if attack_element == 'fire' and target_element == 'water' or \
+            attack_element == 'water' and target_element == 'plant' or \
+            attack_element == 'plant' and target_element == 'fire':
+            amount *= 0.5
+            
+        target_defense = 1 - target_sprite.monster.get_stat('defense') / 2000
+        target_defense = max(0, min(1, target_defense))
+    
+        
+        #update the monster health
+        target_sprite.monster.health -= amount * target_defense
+        
+        #resume
+        self.update_all_monsters('resume')
+        
+        # print(target_sprite)
+        # print(attack)
+        # print(amount)
     
     #ui
     def draw_ui(self):
