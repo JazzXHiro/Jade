@@ -25,4 +25,4 @@ class Timer:
 			current_time = get_ticks()
 			if current_time - self.start_time >= self.duration:
 				if self.func: self.func()
-				self.deactivate()
+				self.deactivate() #end the timer
