@@ -29,7 +29,7 @@ def import_folder_dict(*path):
 
 def import_sub_folders(*path):
 	frames = {}
-	for _, sub_folders, __ in walk(join(*path)):
+	for _, sub_folders, __ in walk(join(*path)): #path
 		if sub_folders:
 			for sub_folder in sub_folders:
 				frames[sub_folder] = import_folder(*path, sub_folder)
