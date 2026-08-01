@@ -37,7 +37,7 @@ class Game:
 		}
   
 		self.dummy_monsters = {
-			0: Monster('Atrox', 15),
+			0: Monster('Atrox', 10),
 			1: Monster('Sparchu', 3),
 			2: Monster('Gulfin', 5),
 			3: Monster('Jacana', 2),
@@ -196,7 +196,7 @@ class Game:
 					self.transition_target = None
     
 		self.tint_progress = max(0, min(self.tint_progress, 255))
-		self.tint_surf.set_alpha(self.tint_progress)
+		self.tint_surf.set_alpha(self.tint_progress)	
 		self.display_surface.blit(self.tint_surf, (0,0))
 		# print(self.tint_progress)
 
