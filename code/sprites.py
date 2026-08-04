@@ -33,10 +33,14 @@ class CollidableSprite(Sprite):
         self.hitbox = self.rect.inflate(-self.rect.width*0.3, -self.rect.height*0.82)
   
 class MonsterPatchSprite(Sprite):
-    def __init__(self, pos, surf, groups, biome):
+    def __init__(self, pos, surf, groups, biome, monsters, level):
         self.biome = biome
         super().__init__(pos, surf, groups, WORLD_LAYERS['main' if biome != 'sand' else 'bg'])
         self.y_sort -= 40
+        self.biome = biome
+        self.monsters = monsters.split(',')
+        self.level = level
+        
 
 class AnimatedSprite(Sprite):
 	def __init__(self, pos, frames, groups, z = WORLD_LAYERS['main']):

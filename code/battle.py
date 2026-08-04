@@ -8,13 +8,17 @@ from random import choice
 
 class Battle:
     #main
-    def __init__(self, player_monsters, opponenet_monsters, monster_frames, bg_surf, fonts):
+    def __init__(self, player_monsters, opponent_monsters, monster_frames, bg_surf, fonts, end_battle, character, sounds):
         #general
         self.display_surface = pygame.display.get_surface()
         self.bg_surf = bg_surf
         self.monster_frames = monster_frames
         self.fonts = fonts
-        self.monster_data = {'player': player_monsters, 'opponent': opponenet_monsters} #this is sometimes necessary as sometimes you would wanna update all the monsters.
+        self.monster_data = {'player': player_monsters, 'opponent': opponent_monsters} #this is sometimes necessary as sometimes you would wanna update all the monsters.
+        self.battle_over = False
+        self.end_battle = end_battle
+        self.character = character
+        self.sounds = sounds
 
         self.timers = {
             'opponent delay' : Timer(600, func = self.opponent_attack)
@@ -51,6 +55,7 @@ class Battle:
         print(self.monster_data['opponent'])
     #pos index is the position of the monster in the battle window
     def create_monster(self, monster, index, pos_index, entity): #purpose of index is to uniquely identify a same entries of a monster
+        monster.paused = False
         frames = self.monster_frames['monsters'][monster.name]
         outline_frames = self.monster_frames['outlines'][monster.name]
         if entity == 'player':
@@ -92,7 +97,10 @@ class Battle:
 
                 if self.selection_mode == 'switch':
                     index, new_monster = list(self.available_monsters.items())[self.indexes['switch']]
-                    print(index, new_monster)
+                    self.current_monster.kill()
+                    self.create_monster(new_monster, index, self.current_monster.pos_index, 'player')
+                    self.selection_mode = None
+                    self.update_all_monsters('resume')
                 
                 if self.selection_mode == 'target':
                     sprite_group = self.opponent_sprites if self.selection_side == 'opponent' else self.player_sprites
@@ -123,6 +131,7 @@ class Battle:
                         self.selection_mode = 'attacks'
                     
                     elif self.indexes['general'] == 1:
+                        self.current_monster.monster.defending = True
                         self.update_all_monsters('resume')
                         self.current_monster, self.selection_mode = None, None
                         self.indexes['general'] = 0
@@ -145,6 +154,7 @@ class Battle:
     def check_active(self):
         for monster_sprite in self.player_sprites.sprites() + self.opponent_sprites.sprites():
             if monster_sprite.monster.initiative >= 100:
+                monster_sprite.monster.defending = False
                 self.update_all_monsters('pause')
                 monster_sprite.monster.initiative = 0
                 monster_sprite.self_highlight(True)
@@ -155,6 +165,10 @@ class Battle:
                     self.selection_mode = 'general'
                 else:
                     self.timers['opponent delay'].activate()
+                # only one monster may take a turn per frame; without this a
+                # second monster crossing 100 in the same frame overwrites
+                # current_monster (e.g. an opponent stealing the player's turn)
+                break
 
     def update_all_monsters(self, option):
         for monster_sprite in self.player_sprites.sprites() + self.opponent_sprites.sprites():
@@ -162,6 +176,7 @@ class Battle:
             
     def apply_attack(self, target_sprite, attack, amount):
         AttackSprite(target_sprite.rect.center, self.monster_frames['attacks'][ATTACK_DATA[attack]['animation']], self.battle_sprites)
+        self.sounds[ATTACK_DATA[attack]['animation']].play()
         
         #get correct attack damage amount (defense, element)
         attack_element = ATTACK_DATA[attack]['element']
@@ -180,6 +195,8 @@ class Battle:
             amount *= 0.5
             
         target_defense = 1 - target_sprite.monster.get_stat('defense') / 2000
+        if target_sprite.monster.defending:
+            target_defense -= 0.2
         target_defense = max(0, min(1, target_defense))
     
         
@@ -218,9 +235,26 @@ class Battle:
                 monster_sprite.delayed_kill(new_monster_data)
                     
     def opponent_attack(self):
+        # the delay timer may fire after the active monster is gone (killed or
+        # its turn already resolved), so guard before dereferencing it
+        if not self.current_monster:
+            return
         ability = choice(self.current_monster.monster.get_abilities())
         random_target = choice(self.opponent_sprites.sprites()) if ATTACK_DATA[ability]['target'] == 'player' else choice(self.player_sprites.sprites())
         self.current_monster.activate_attack(random_target, ability)
+
+    def check_end_battle(self):
+        # opponents have been defeated
+        if len(self.opponent_sprites) == 0 and not self.battle_over:
+            self.battle_over = True
+            self.end_battle(self.character)
+            for monster in self.monster_data['player'].values():
+                monster.initiative = 0
+
+        # player has been defeated
+        if len(self.player_sprites) == 0:
+            pygame.quit()
+            exit()
     
     #ui
     def draw_ui(self):
@@ -321,6 +355,7 @@ class Battle:
         
     def update(self, dt):
         #updates
+        self.check_end_battle()
         self.input()
         self.update_timers()
         self.battle_sprites.update(dt)
